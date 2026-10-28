@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>المهارات الرقمية - أول متوسط: الخوارزميات ومخططات الانسياب</title>
     <style>
         :root {
@@ -17,11 +17,12 @@
         * {
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             margin: 0;
-            padding: 16px;
+            padding: 12px;
             background: var(--bg);
             color: #1e293b;
         }
@@ -31,55 +32,72 @@
             margin: 0 auto;
             background: var(--card);
             border-radius: 16px;
-            padding: 20px;
+            padding: 18px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
         }
 
         h1 {
             text-align: center;
             color: var(--primary);
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             margin-top: 0;
+            line-height: 1.4;
         }
 
+        /* شريط بيانات الطالب */
         .student-bar {
             display: flex;
             gap: 10px;
             margin-bottom: 16px;
             background: #eff6ff;
             padding: 12px;
-            border-radius: 10px;
+            border-radius: 12px;
             align-items: center;
             flex-wrap: wrap;
         }
 
-        .student-bar input {
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             flex: 1;
-            min-width: 180px;
-            padding: 8px 12px;
-            border: 1px solid #bfdbfe;
-            border-radius: 8px;
-            font-size: 1rem;
+            min-width: 220px;
         }
 
+        .input-group label {
+            white-space: nowrap;
+            font-size: 0.95rem;
+        }
+
+        .student-bar input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            font-size: 16px;
+            background: #fff;
+        }
+
+        /* التبويبات */
         .tabs {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 8px;
+            margin-bottom: 18px;
             border-bottom: 2px solid #e2e8f0;
             padding-bottom: 10px;
         }
 
         .tab-btn {
             flex: 1;
-            padding: 10px;
+            padding: 12px 8px;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             background: #e2e8f0;
             color: #475569;
             font-weight: bold;
             cursor: pointer;
-            font-size: 1rem;
+            font-size: 0.95rem;
+            transition: 0.2s;
         }
 
         .tab-btn.active {
@@ -95,7 +113,7 @@
             display: block;
         }
 
-        /* Simulator Styles */
+        /* تنسيقات المحاكي */
         .scen-btns {
             display: flex;
             gap: 8px;
@@ -105,12 +123,14 @@
 
         .scen-btn {
             flex: 1;
-            padding: 8px;
+            min-width: 140px;
+            padding: 10px 8px;
             border: 1px solid #cbd5e1;
             border-radius: 8px;
             background: white;
             cursor: pointer;
             font-weight: 600;
+            font-size: 0.9rem;
         }
 
         .scen-btn.active {
@@ -128,49 +148,85 @@
             border-radius: 10px;
             margin-bottom: 16px;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 12px;
+        }
+
+        .nav-btns {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .nav-btns button {
+            flex: 1;
+            padding: 11px;
+            font-size: 0.95rem;
+        }
+
+        .slider-wrap {
+            width: 100%;
+            text-align: center;
+            background: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .slider-wrap input[type="range"] {
+            width: 90%;
+            height: 28px;
+            margin-top: 6px;
+            accent-color: var(--primary);
+            cursor: pointer;
         }
 
         .flow-box {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             margin: 16px 0;
+            overflow-x: hidden;
+            padding: 6px;
         }
 
         .node {
-            padding: 10px 20px;
+            padding: 12px 16px;
             text-align: center;
             font-weight: bold;
-            min-width: 220px;
+            width: 88%;
+            max-width: 320px;
             transition: 0.25s;
             border: 2px solid #94a3b8;
             background: #fff;
+            font-size: 0.95rem;
         }
 
         .node.oval {
             border-radius: 30px;
             background: #f1f5f9;
+            width: 65%;
+            max-width: 200px;
         }
 
         .node.para {
-            transform: skew(-12deg);
+            transform: skew(-10deg);
             background: #fef3c7;
         }
 
         .node.para span {
             display: inline-block;
-            transform: skew(12deg);
+            transform: skew(10deg);
         }
 
         .node.rect {
-            border-radius: 4px;
+            border-radius: 6px;
             background: #e0f2fe;
         }
 
         .node.diamond {
-            border-radius: 8px;
+            border-radius: 10px;
             background: #fce7f3;
             border-style: dashed;
         }
@@ -178,7 +234,7 @@
         .node.active-step {
             border-color: var(--primary);
             box-shadow: 0 0 0 4px #bfdbfe;
-            transform: scale(1.04);
+            transform: scale(1.03);
         }
 
         .arrow {
@@ -191,40 +247,44 @@
             background: #f0fdf4;
             border: 1px solid #bbf7d0;
             padding: 12px;
-            border-radius: 8px;
+            border-radius: 10px;
             text-align: center;
             font-weight: 600;
             color: #166534;
+            font-size: 0.95rem;
+            line-height: 1.5;
         }
 
-        /* Quiz Styles */
+        /* تنسيقات الاختبار */
         .q-card {
             background: #f8fafc;
             border: 1px solid #e2e8f0;
-            padding: 16px;
+            padding: 14px;
             border-radius: 12px;
             margin-bottom: 14px;
         }
 
         .q-title {
             font-weight: bold;
-            margin-bottom: 10px;
-            font-size: 1.05rem;
+            margin-bottom: 12px;
+            font-size: 1rem;
+            line-height: 1.5;
         }
 
         .options {
             display: grid;
-            gap: 8px;
+            gap: 10px;
         }
 
         .opt-btn {
             text-align: right;
-            padding: 10px 14px;
+            padding: 12px 14px;
             border: 1px solid #cbd5e1;
-            border-radius: 8px;
+            border-radius: 10px;
             background: white;
             cursor: pointer;
             font-size: 0.95rem;
+            line-height: 1.4;
         }
 
         .opt-btn.correct {
@@ -241,16 +301,17 @@
         }
 
         .feedback {
-            margin-top: 8px;
+            margin-top: 10px;
             font-size: 0.9rem;
-            padding: 8px;
-            border-radius: 6px;
+            padding: 10px;
+            border-radius: 8px;
             display: none;
+            line-height: 1.4;
         }
 
         .score-banner {
             text-align: center;
-            padding: 20px;
+            padding: 18px;
             background: #eff6ff;
             border: 2px solid var(--primary);
             border-radius: 12px;
@@ -261,7 +322,7 @@
             background: var(--primary);
             color: white;
             border: none;
-            padding: 8px 16px;
+            padding: 10px 16px;
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
@@ -271,21 +332,59 @@
             background: var(--success);
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
+            padding: 12px 20px;
+            border-radius: 10px;
             cursor: pointer;
             font-weight: bold;
             font-size: 1rem;
-            margin-top: 10px;
+            margin-top: 12px;
+            width: 100%;
+            max-width: 320px;
             display: none;
         }
 
         .status-msg {
             margin-top: 12px;
-            padding: 10px;
+            padding: 12px;
             border-radius: 8px;
             font-weight: bold;
             display: none;
+            line-height: 1.5;
+            font-size: 0.95rem;
+        }
+
+        /* تحسينات مخصصة لشاشات الجوال أقل من 600 بكسل */
+        @media (max-width: 600px) {
+            body {
+                padding: 8px;
+            }
+
+            .container {
+                padding: 14px 12px;
+                border-radius: 12px;
+            }
+
+            h1 {
+                font-size: 1.15rem;
+            }
+
+            .tabs {
+                flex-direction: column;
+                gap: 6px;
+            }
+
+            .scen-btn {
+                flex: 100%;
+            }
+
+            .input-group {
+                flex: 100%;
+            }
+
+            .node {
+                width: 92%;
+                font-size: 0.9rem;
+            }
         }
     </style>
 </head>
@@ -293,12 +392,16 @@
 <body>
     <div class="container">
         <h1>المهارات الرقمية (أول متوسط): الخوارزميات ومخططات الانسياب</h1>
+
         <div class="student-bar">
-            <label><strong>اسم الطالب/ـة:</strong></label>
-            <input type="text" id="studentName" placeholder="اكتب اسمك الثلاثي هنا..." oninput="updateName()">
-            <label><strong>الفصل:</strong></label>
-            <input type="text" id="studentClass" placeholder="مثال: 1 / أ" style="max-width: 120px;"
-                oninput="updateName()">
+            <div class="input-group">
+                <label><strong>اسم الطالب/ـة:</strong></label>
+                <input type="text" id="studentName" placeholder="اكتب اسمك الثلاثي هنا..." oninput="updateName()">
+            </div>
+            <div class="input-group" style="max-width: 200px;">
+                <label><strong>الفصل:</strong></label>
+                <input type="text" id="studentClass" placeholder="مثال: 1 أ" oninput="updateName()">
+            </div>
         </div>
 
         <div class="tabs">
@@ -314,12 +417,13 @@
                 <button class="scen-btn" onclick="loadScenario(2)">تدريب 3: قرار النجاح (شرط)</button>
             </div>
             <div class="sim-controls">
-                <div>
+                <div class="nav-btns">
                     <button class="btn-main" onclick="moveStep(-1)">الخطوة السابقة</button>
                     <button class="btn-main" onclick="moveStep(1)">الخطوة التالية</button>
                 </div>
-                <div id="sliderBox" style="display:none;">
-                    <label>درجة الطالب: <strong id="gradeVal">65</strong></label>
+                <div id="sliderBox" class="slider-wrap" style="display:none;">
+                    <div>غيّر درجة الطالب لتجربة الشرط: <strong id="gradeVal"
+                            style="color:var(--primary); font-size:1.1rem;">65</strong></div>
                     <input type="range" min="0" max="100" value="65" oninput="updateGrade(this.value)">
                 </div>
             </div>
@@ -334,9 +438,10 @@
                 <h3 style="margin:0 0 8px 0;">بطاقة النتيجة النهائية</h3>
                 <p style="margin:4px 0;">الطالب/ـة: <strong id="certName">غير محدد</strong> | الفصل: <strong
                         id="certClass">غير محدد</strong></p>
-                <p style="font-size:1.3rem; margin:8px 0; color:var(--primary);">الدرجة: <strong
+                <p style="font-size:1.35rem; margin:10px 0; color:var(--primary);">الدرجة: <strong
                         id="scoreVal">0</strong> / 10</p>
-                <p style="margin:4px 0; color:#475569;">الأسئلة المجابة: <strong id="answeredCount">0</strong> من 10</p>
+                <p style="margin:4px 0; color:#475569; font-size:0.9rem;">الأسئلة المجابة: <strong
+                        id="answeredCount">0</strong> من 10</p>
                 <button id="manualSendBtn" class="btn-send" onclick="sendResultToSheet()">إرسال النتيجة إلى سجل
                     المعلم</button>
                 <div id="sendStatus" class="status-msg"></div>
@@ -420,7 +525,7 @@
             { q: "3. يُوضع الأمر (أدخل طول الضلع) عند رسم مخطط الانسياب داخل شكل:", opts: ["متوازي أضلاع", "مستطيل", "معين", "دائرة"], ans: 0, exp: "عمليات الإدخال والإخراج توضع دائماً داخل متوازي أضلاع." },
             { q: "4. أي العبارات التالية يجب وضعها داخل شكل المستطيل؟", opts: ["اقرأ العدد الأول", "هل العدد أكبر من 0؟", "المجموع = العدد الأول + العدد الثاني", "اطبع الناتج"], ans: 2, exp: "المستطيل مخصص للعمليات الحسابية والمعالجة." },
             { q: "5. الشكل الهندسي الذي يُستخدم لاتخاذ القرار ويتفرع منه سهمان (نعم / لا) هو:", opts: ["المستطيل", "المعين", "متوازي الأضلاع", "البيضاوي"], ans: 1, exp: "المعين يمثل المقارنة أو الشرط." },
-            { q: "6. الترتيب المنطقي الصحيح لمراحل حل المسألة هو:", opts: ["المخرجات ← المعالجة ← المدخلات", "المعالجة ← المدخلات ← المخرجات", "المدخلات ← المعالجة ← المخرجات", "المدخلات ← المخرجات ← المعالجة"], ans: 2, exp: "نبدأ بالمدخلات، ثم معالجتها، ثم إخراج النتيجة." },
+            { q: "6. الترتيب المنطقي الصحيح لمراحل حل المسألة هو:", opts: ["المخرجات ثم المعالجة ثم المدخلات", "المعالجة ثم المدخلات ثم المخرجات", "المدخلات ثم المعالجة ثم المخرجات", "المدخلات ثم المخرجات ثم المعالجة"], ans: 2, exp: "نبدأ بالمدخلات، ثم معالجتها، ثم إخراج النتيجة." },
             { q: "7. (صواب أو خطأ): يُستخدم المستطيل لتمثيل عمليات الإدخال والإخراج مثل طباعة النتائج.", opts: ["صواب", "خطأ"], ans: 1, exp: "خطأ؛ متوازي الأضلاع هو المخصص للإدخال والإخراج." },
             { q: "8. (صواب أو خطأ): من شروط الخوارزمية السليمة أن تتوقف وتصل إلى حل بعد عدد محدد من الخطوات.", opts: ["صواب", "خطأ"], ans: 0, exp: "صواب؛ يجب أن تكون خطوات الخوارزمية محددة ومنتهية." },
             { q: "9. (صواب أو خطأ): يخرج من شكل المعين سهم واحد فقط دائماً كبقية الأشكال.", opts: ["صواب", "خطأ"], ans: 1, exp: "خطأ؛ يخرج من المعين سهمان على الأقل لفرعي (نعم) و(لا)." },
@@ -464,7 +569,6 @@
             const totalAnswered = Object.keys(answered).length;
             document.getElementById('answeredCount').textContent = totalAnswered;
 
-            // عند إكمال جميع الأسئلة العشرة وظهور الدرجة النهائية، يتم الإرسال تلقائياً
             if (totalAnswered === questions.length) {
                 sendResultToSheet();
             }
@@ -478,7 +582,6 @@
             const manualBtn = document.getElementById('manualSendBtn');
             statusBox.style.display = 'block';
 
-            // التأكد من كتابة الطالب لاسمه قبل الإرسال
             if (!nameInput) {
                 statusBox.style.background = '#fef3c7';
                 statusBox.style.color = '#92400e';
