@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المهارات الرقمية - أول متوسط: الخوارزميات ومخططات الانسياب</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --bg: #f8fafc;
+            --card: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 16px;
+            background: var(--bg);
+            color: #1e293b;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--card);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary);
+            font-size: 1.4rem;
+            margin-top: 0;
+        }
+
+        .student-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+            background: #eff6ff;
+            padding: 12px;
+            border-radius: 10px;
+            align-items: center;
+        }
+
+        .student-bar input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            background: #e2e8f0;
+            color: #475569;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* Simulator Styles */
+        .scen-btns {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .scen-btn {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .scen-btn.active {
+            background: #dbeafe;
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .sim-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f1f5f9;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .flow-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            margin: 16px 0;
+        }
+
+        .node {
+            padding: 10px 20px;
+            text-align: center;
+            font-weight: bold;
+            min-width: 220px;
+            transition: 0.25s;
+            border: 2px solid #94a3b8;
+            background: #fff;
+        }
+
+        .node.oval {
+            border-radius: 30px;
+            background: #f1f5f9;
+        }
+
+        .node.para {
+            transform: skew(-12deg);
+            background: #fef3c7;
+        }
+
+        .node.para span {
+            display: inline-block;
+            transform: skew(12deg);
+        }
+
+        .node.rect {
+            border-radius: 4px;
+            background: #e0f2fe;
+        }
+
+        .node.diamond {
+            border-radius: 8px;
+            background: #fce7f3;
+            border-style: dashed;
+        }
+
+        .node.active-step {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px #bfdbfe;
+            transform: scale(1.04);
+        }
+
+        .arrow {
+            font-size: 1.2rem;
+            color: #64748b;
+            line-height: 1;
+        }
+
+        .hint-box {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            color: #166534;
+        }
+
+        /* Quiz Styles */
+        .q-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 14px;
+        }
+
+        .q-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1.05rem;
+        }
+
+        .options {
+            display: grid;
+            gap: 8px;
+        }
+
+        .opt-btn {
+            text-align: right;
+            padding: 10px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .opt-btn.correct {
+            background: #dcfce7;
+            border-color: var(--success);
+            color: #14532d;
+            font-weight: bold;
+        }
+
+        .opt-btn.wrong {
+            background: #fee2e2;
+            border-color: var(--danger);
+            color: #7f1d1d;
+        }
+
+        .feedback {
+            margin-top: 8px;
+            font-size: 0.9rem;
+            padding: 8px;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .score-banner {
+            text-align: center;
+            padding: 20px;
+            background: #eff6ff;
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            margin-top: 16px;
+        }
+
+        .btn-main {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>المهارات الرقمية (أول متوسط): الخوارزميات ومخططات الانسياب</h1>
+        <div class="student-bar">
+            <label><strong>اسم الطالب/ـة:</strong></label>
+            <input type="text" id="studentName" placeholder="اكتب اسمك الثلاثي هنا قبل البدء..." oninput="updateName()">
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('sim')">1. محاكي مخططات الانسياب</button>
+            <button class="tab-btn" onclick="switchTab('quiz')">2. الاختبار القصير (10 درجات)</button>
+        </div>
+
+        <!-- القسم الأول: المحاكي -->
+        <div id="sim" class="section active">
+            <div class="scen-btns">
+                <button class="scen-btn active" onclick="loadScenario(0)">تدريب 1: مساحة المستطيل</button>
+                <button class="scen-btn" onclick="loadScenario(1)">تدريب 2: متوسط عددين</button>
+                <button class="scen-btn" onclick="loadScenario(2)">تدريب 3: قرار النجاح (شرط)</button>
+            </div>
+            <div class="sim-controls">
+                <div>
+                    <button class="btn-main" onclick="moveStep(-1)">الخطوة السابقة</button>
+                    <button class="btn-main" onclick="moveStep(1)">الخطوة التالية</button>
+                </div>
+                <div id="sliderBox" style="display:none;">
+                    <label>درجة الطالب: <strong id="gradeVal">65</strong></label>
+                    <input type="range" min="0" max="100" value="65" oninput="updateGrade(this.value)">
+                </div>
+            </div>
+            <div id="flowContainer" class="flow-box"></div>
+            <div id="stepHint" class="hint-box"></div>
+        </div>
+
+        <!-- القسم الثاني: الاختبار -->
+        <div id="quiz" class="section">
+            <div id="quizContainer"></div>
+            <div class="score-banner">
+                <h3 style="margin:0 0 8px 0;">بطاقة النتيجة النهائية</h3>
+                <p style="margin:4px 0;">الطالب/ـة: <strong id="certName">غير محدد</strong></p>
+                <p style="font-size:1.3rem; margin:8px 0; color:var(--primary);">الدرجة: <strong
+                        id="scoreVal">0</strong> / 10</p>
+                <small>التقط صورة شاشة (Screenshot) لهذه البطاقة بعد إكمال جميع الأسئلة وأرسلها لمعلمك.</small>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentScen = 0, currentStep = 0, grade = 65;
+        const scenarios = [
+            {
+                steps: [
+                    { text: "1. البداية", shape: "oval", hint: "الشكل البيضاوي: يُستخدم دائماً لتحديد بداية البرنامج." },
+                    { text: "2. أدخل الطول (8) والعرض (5)", shape: "para", hint: "متوازي الأضلاع: يُستخدم لإدخال البيانات وقراءتها." },
+                    { text: "3. المساحة = 8 × 5 = 40", shape: "rect", hint: "المستطيل: يُستخدم للعمليات الحسابية والمعالجة." },
+                    { text: "4. اطبع المساحة (40)", shape: "para", hint: "متوازي الأضلاع: يُستخدم أيضاً لإخراج وطباعة النتائج." },
+                    { text: "5. النهاية", shape: "oval", hint: "الشكل البيضاوي: يُستخدم لتحديد نقطة توقف البرنامج." }
+                ]
+            },
+            {
+                steps: [
+                    { text: "1. البداية", shape: "oval", hint: "الشكل البيضاوي: بداية الخوارزمية." },
+                    { text: "2. أدخل العددين (12 ، 18)", shape: "para", hint: "متوازي الأضلاع: إدخال قيم العددين." },
+                    { text: "3. المجموع = 12 + 18 = 30", shape: "rect", hint: "المستطيل الأول: عملية جمع العددين." },
+                    { text: "4. المتوسط = 30 ÷ 2 = 15", shape: "rect", hint: "المستطيل الثاني: عملية قسمة المجموع على 2." },
+                    { text: "5. اطبع المتوسط (15)", shape: "para", hint: "متوازي الأضلاع: عرض الناتج النهائي." },
+                    { text: "6. النهاية", shape: "oval", hint: "الشكل البيضاوي: نهاية البرنامج." }
+                ]
+            },
+            {
+                steps: [
+                    { text: "1. البداية", shape: "oval", hint: "الشكل البيضاوي: بداية البرنامج." },
+                    { text: () => `2. أدخل درجة الطالب (${grade})`, shape: "para", hint: "متوازي الأضلاع: قراءة درجة الطالب." },
+                    { text: () => `3. هل الدرجة (${grade}) ≥ 50 ؟`, shape: "diamond", hint: "المعين: شكل اتخاذ القرار (الشرط) ويتفرع منه مساران (نعم / لا)." },
+                    { text: () => grade >= 50 ? "4. مسار (نعم): اطبع 'ناجح'" : "4. مسار (لا): اطبع 'غير مجتاز'", shape: "para", hint: "متوازي الأضلاع: يطبع النتيجة بناءً على تحقق الشرط في المعين." },
+                    { text: "5. النهاية", shape: "oval", hint: "الشكل البيضاوي: نهاية البرنامج." }
+                ]
+            }
+        ];
+
+        function renderSim() {
+            document.getElementById('sliderBox').style.display = currentScen === 2 ? 'block' : 'none';
+            const list = scenarios[currentScen].steps;
+            const container = document.getElementById('flowContainer');
+            container.innerHTML = '';
+            list.forEach((s, idx) => {
+                const label = typeof s.text === 'function' ? s.text() : s.text;
+                const div = document.createElement('div');
+                div.className = `node ${s.shape} ${idx === currentStep ? 'active-step' : ''}`;
+                div.innerHTML = `<span>${label}</span>`;
+                div.onclick = () => { currentStep = idx; renderSim(); };
+                container.appendChild(div);
+                if (idx < list.length - 1) {
+                    const arr = document.createElement('div');
+                    arr.className = 'arrow';
+                    arr.textContent = '⬇';
+                    container.appendChild(arr);
+                }
+            });
+            document.getElementById('stepHint').textContent = list[currentStep].hint;
+        }
+
+        function loadScenario(idx) {
+            currentScen = idx; currentStep = 0;
+            document.querySelectorAll('.scen-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
+            renderSim();
+        }
+        function moveStep(dir) {
+            const len = scenarios[currentScen].steps.length;
+            currentStep = Math.max(0, Math.min(len - 1, currentStep + dir));
+            renderSim();
+        }
+        function updateGrade(val) { grade = Number(val); document.getElementById('gradeVal').textContent = val; renderSim(); }
+
+        const questions = [
+            { q: "1. تُعرف مجموعة الأوامر المكتوبة بصورة واضحة ومتسلسلة لحل مسألة معينة باسم:", opts: ["مخطط الانسياب", "الخوارزمية", "لغة البرمجة", "المدخلات"], ans: 1, exp: "الخوارزمية هي الخطوات المتسلسلة، بينما مخطط الانسياب هو التمثيل الرسومي لها." },
+            { q: "2. ما الشكل الهندسي المستخدم لتمثيل نقطتي البداية والنهاية؟", opts: ["المستطيل", "متوازي الأضلاع", "الشكل البيضاوي", "المعين"], ans: 2, exp: "يُخصص الشكل البيضاوي لبداية ونهاية مخطط الانسياب." },
+            { q: "3. يُوضع الأمر (أدخل طول الضلع) عند رسم مخطط الانسياب داخل شكل:", opts: ["متوازي أضلاع", "مستطيل", "معين", "دائرة"], ans: 0, exp: "عمليات الإدخال والإخراج توضع دائماً داخل متوازي أضلاع." },
+            { q: "4. أي العبارات التالية يجب وضعها داخل شكل المستطيل؟", opts: ["اقرأ العدد الأول", "هل العدد أكبر من 0؟", "المجموع = العدد الأول + العدد الثاني", "اطبع الناتج"], ans: 2, exp: "المستطيل مخصص للعمليات الحسابية والمعالجة." },
+            { q: "5. الشكل الهندسي الذي يُستخدم لاتخاذ القرار ويتفرع منه سهمان (نعم / لا) هو:", opts: ["المستطيل", "المعين", "متوازي الأضلاع", "البيضاوي"], ans: 1, exp: "المعين يمثل المقارنة أو الشرط." },
+            { q: "6. الترتيب المنطقي الصحيح لمراحل حل المسألة هو:", opts: ["المخرجات ← المعالجة ← المدخلات", "المعالجة ← المدخلات ← المخرجات", "المدخلات ← المعالجة ← المخرجات", "المدخلات ← المخرجات ← المعالجة"], ans: 2, exp: "نبدأ بالمدخلات، ثم معالجتها، ثم إخراج النتيجة." },
+            { q: "7. (صواب أو خطأ): يُستخدم المستطيل لتمثيل عمليات الإدخال والإخراج مثل طباعة النتائج.", opts: ["صواب", "خطأ"], ans: 1, exp: "خطأ؛ متوازي الأضلاع هو المخصص للإدخال والإخراج." },
+            { q: "8. (صواب أو خطأ): من شروط الخوارزمية السليمة أن تتوقف وتصل إلى حل بعد عدد محدد من الخطوات.", opts: ["صواب", "خطأ"], ans: 0, exp: "صواب؛ يجب أن تكون خطوات الخوارزمية محددة ومنتهية." },
+            { q: "9. (صواب أو خطأ): يخرج من شكل المعين سهم واحد فقط دائماً كبقية الأشكال.", opts: ["صواب", "خطأ"], ans: 1, exp: "خطأ؛ يخرج من المعين سهمان على الأقل لفرعي (نعم) و(لا)." },
+            { q: "10. (صواب أو خطأ): يُعد مخطط الانسياب تمثيلاً رسومياً للخوارزمية يسهّل فهم البرنامج.", opts: ["صواب", "خطأ"], ans: 0, exp: "صواب؛ يوضح مسار البرنامج بصرياً قبل برمجته." }
+        ];
+
+        let score = 0, answered = {};
+        function renderQuiz() {
+            const qc = document.getElementById('quizContainer');
+            qc.innerHTML = '';
+            questions.forEach((item, qIdx) => {
+                const card = document.createElement('div');
+                card.className = 'q-card';
+                let optsHtml = item.opts.map((o, oIdx) => `<button class="opt-btn" id="btn-${qIdx}-${oIdx}" onclick="answer(${qIdx},${oIdx})">${o}</button>`).join('');
+                card.innerHTML = `<div class="q-title">${item.q}</div><div class="options">${optsHtml}</div><div class="feedback" id="fb-${qIdx}"></div>`;
+                qc.appendChild(card);
+            });
+        }
+
+        function answer(qIdx, oIdx) {
+            if (answered[qIdx] !== undefined) return;
+            answered[qIdx] = oIdx;
+            const item = questions[qIdx];
+            const btn = document.getElementById(`btn-${qIdx}-${oIdx}`);
+            const correctBtn = document.getElementById(`btn-${qIdx}-${item.ans}`);
+            const fb = document.getElementById(`fb-${qIdx}`);
+            if (oIdx === item.ans) {
+                btn.classList.add('correct');
+                score++;
+                fb.style.background = '#dcfce7'; fb.style.color = '#14532d';
+                fb.textContent = '✓ إجابة صحيحة! ' + item.exp;
+            } else {
+                btn.classList.add('wrong');
+                correctBtn.classList.add('correct');
+                fb.style.background = '#fee2e2'; fb.style.color = '#7f1d1d';
+                fb.textContent = '✗ إجابة غير صحيحة. ' + item.exp;
+            }
+            fb.style.display = 'block';
+            document.getElementById('scoreVal').textContent = score;
+        }
+
+        function switchTab(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            event.target.classList.add('active');
+        }
+        function updateName() {
+            document.getElementById('certName').textContent = document.getElementById('studentName').value || 'غير محدد';
+        }
+
+        renderSim();
+        renderQuiz();
+    </script>
+</body>
+
+</html>
