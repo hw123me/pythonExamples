@@ -50,10 +50,12 @@
             padding: 12px;
             border-radius: 10px;
             align-items: center;
+            flex-wrap: wrap;
         }
 
         .student-bar input {
             flex: 1;
+            min-width: 180px;
             padding: 8px 12px;
             border: 1px solid #bfdbfe;
             border-radius: 8px;
@@ -264,6 +266,27 @@
             cursor: pointer;
             font-weight: bold;
         }
+
+        .btn-send {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .status-msg {
+            margin-top: 12px;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            display: none;
+        }
     </style>
 </head>
 
@@ -272,12 +295,15 @@
         <h1>المهارات الرقمية (أول متوسط): الخوارزميات ومخططات الانسياب</h1>
         <div class="student-bar">
             <label><strong>اسم الطالب/ـة:</strong></label>
-            <input type="text" id="studentName" placeholder="اكتب اسمك الثلاثي هنا قبل البدء..." oninput="updateName()">
+            <input type="text" id="studentName" placeholder="اكتب اسمك الثلاثي هنا..." oninput="updateName()">
+            <label><strong>الفصل:</strong></label>
+            <input type="text" id="studentClass" placeholder="مثال: 1 / أ" style="max-width: 120px;"
+                oninput="updateName()">
         </div>
 
         <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('sim')">1. محاكي مخططات الانسياب</button>
-            <button class="tab-btn" onclick="switchTab('quiz')">2. الاختبار القصير (10 درجات)</button>
+            <button class="tab-btn active" onclick="switchTab('sim', this)">1. محاكي مخططات الانسياب</button>
+            <button class="tab-btn" onclick="switchTab('quiz', this)">2. الاختبار القصير (10 درجات)</button>
         </div>
 
         <!-- القسم الأول: المحاكي -->
@@ -306,15 +332,22 @@
             <div id="quizContainer"></div>
             <div class="score-banner">
                 <h3 style="margin:0 0 8px 0;">بطاقة النتيجة النهائية</h3>
-                <p style="margin:4px 0;">الطالب/ـة: <strong id="certName">غير محدد</strong></p>
+                <p style="margin:4px 0;">الطالب/ـة: <strong id="certName">غير محدد</strong> | الفصل: <strong
+                        id="certClass">غير محدد</strong></p>
                 <p style="font-size:1.3rem; margin:8px 0; color:var(--primary);">الدرجة: <strong
                         id="scoreVal">0</strong> / 10</p>
-                <small>التقط صورة شاشة (Screenshot) لهذه البطاقة بعد إكمال جميع الأسئلة وأرسلها لمعلمك.</small>
+                <p style="margin:4px 0; color:#475569;">الأسئلة المجابة: <strong id="answeredCount">0</strong> من 10</p>
+                <button id="manualSendBtn" class="btn-send" onclick="sendResultToSheet()">إرسال النتيجة إلى سجل
+                    المعلم</button>
+                <div id="sendStatus" class="status-msg"></div>
             </div>
         </div>
     </div>
 
     <script>
+        // ضع رابط تطبيق الويب (Web App URL) الخاص بـ Google Apps Script بين علامتي التنصيص أدناه:
+        const GOOGLE_SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbxSIHZBTMDtjIDs9oU1uluNtvorKxQu5Tvs6Jn9HTWgn8Qg7L19JWfFIMmGsBp2fVDT/exec";
+
         let currentScen = 0, currentStep = 0, grade = 65;
         const scenarios = [
             {
@@ -394,7 +427,7 @@
             { q: "10. (صواب أو خطأ): يُعد مخطط الانسياب تمثيلاً رسومياً للخوارزمية يسهّل فهم البرنامج.", opts: ["صواب", "خطأ"], ans: 0, exp: "صواب؛ يوضح مسار البرنامج بصرياً قبل برمجته." }
         ];
 
-        let score = 0, answered = {};
+        let score = 0, answered = {}, isSent = false;
         function renderQuiz() {
             const qc = document.getElementById('quizContainer');
             qc.innerHTML = '';
@@ -427,16 +460,79 @@
             }
             fb.style.display = 'block';
             document.getElementById('scoreVal').textContent = score;
+
+            const totalAnswered = Object.keys(answered).length;
+            document.getElementById('answeredCount').textContent = totalAnswered;
+
+            // عند إكمال جميع الأسئلة العشرة وظهور الدرجة النهائية، يتم الإرسال تلقائياً
+            if (totalAnswered === questions.length) {
+                sendResultToSheet();
+            }
         }
 
-        function switchTab(id) {
+        function sendResultToSheet() {
+            if (isSent) return;
+            const nameInput = document.getElementById('studentName').value.trim();
+            const classInput = document.getElementById('studentClass').value.trim();
+            const statusBox = document.getElementById('sendStatus');
+            const manualBtn = document.getElementById('manualSendBtn');
+            statusBox.style.display = 'block';
+
+            // التأكد من كتابة الطالب لاسمه قبل الإرسال
+            if (!nameInput) {
+                statusBox.style.background = '#fef3c7';
+                statusBox.style.color = '#92400e';
+                statusBox.textContent = '⚠️ يرجى كتابة اسمك الثلاثي في الخانة العلوية ثم الضغط على زر (إرسال النتيجة إلى سجل المعلم) أدناه.';
+                manualBtn.style.display = 'inline-block';
+                document.getElementById('studentName').focus();
+                return;
+            }
+
+            if (!GOOGLE_SHEET_WEBHOOK_URL || GOOGLE_SHEET_WEBHOOK_URL.includes("ضع_رابط")) {
+                statusBox.style.background = '#fee2e2';
+                statusBox.style.color = '#991b1b';
+                statusBox.textContent = 'تنبيه للمعلم: لم يتم وضع رابط Google Apps Script في الكود بعد.';
+                return;
+            }
+
+            isSent = true;
+            manualBtn.style.display = 'none';
+            statusBox.style.background = '#dbeafe';
+            statusBox.style.color = '#1e40af';
+            statusBox.textContent = '⏳ جاري إرسال اسمك ونتيجتك إلى سجل المعلم في قوقل شيت...';
+
+            fetch(GOOGLE_SHEET_WEBHOOK_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({
+                    name: nameInput,
+                    className: classInput || 'غير محدد',
+                    score: score
+                })
+            }).then(() => {
+                statusBox.style.background = '#dcfce7';
+                statusBox.style.color = '#14532d';
+                statusBox.textContent = '✅ تم إرسال اسمك ودرجتك النهائية (' + score + ' من 10) إلى سجل المعلم بنجاح!';
+            }).catch(() => {
+                isSent = false;
+                manualBtn.style.display = 'inline-block';
+                statusBox.style.background = '#fee2e2';
+                statusBox.style.color = '#991b1b';
+                statusBox.textContent = '❌ تعذر الاتصال بالإنترنت. اضغط على زر الإرسال للمحاولة مرة أخرى.';
+            });
+        }
+
+        function switchTab(id, btnElement) {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            event.target.classList.add('active');
+            btnElement.classList.add('active');
         }
+
         function updateName() {
-            document.getElementById('certName').textContent = document.getElementById('studentName').value || 'غير محدد';
+            document.getElementById('certName').textContent = document.getElementById('studentName').value.trim() || 'غير محدد';
+            document.getElementById('certClass').textContent = document.getElementById('studentClass').value.trim() || 'غير محدد';
         }
 
         renderSim();
